@@ -168,13 +168,25 @@ def main():
     # Generate data with the same seed as in the notebook
     sensor_a, sensor_b, timestamps = generate_data(9461)
 
-    # Create a 1x3 subplot figure
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    # Create a 2x2 subplot figure
+    fig, axes = plt.subplots(2, 2, figsize=(15, 10))
 
     # Create each plot
-    plot_scatter(sensor_a, sensor_b, timestamps, axes[0])
-    plot_histogram(sensor_a, sensor_b, axes[1])
-    plot_boxplot(sensor_a, sensor_b, axes[2])
+    plot_scatter(sensor_a, sensor_b, timestamps, axes[0, 0])
+    plot_histogram(sensor_a, sensor_b, axes[0, 1])
+    plot_boxplot(sensor_a, sensor_b, axes[1, 0])
+
+    # Add summary statistics to the fourth cell
+    stats_ax = axes[1, 1]
+    stats_ax.axis('off')
+    stats_text = (
+        f"Sensor A mean: {np.mean(sensor_a):.2f} °C\n"
+        f"Sensor B mean: {np.mean(sensor_b):.2f} °C\n\n"
+        f"Sensor A std: {np.std(sensor_a, ddof=0):.2f} °C\n"
+        f"Sensor B std: {np.std(sensor_b, ddof=0):.2f} °C\n\n"
+        f"Number of readings: {sensor_a.size}"
+    )
+    stats_ax.text(0.5, 0.5, stats_text, ha='center', va='center', fontsize=12)
 
     # Adjust layout and save
     plt.tight_layout()
