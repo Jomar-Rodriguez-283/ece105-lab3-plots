@@ -10,6 +10,7 @@ Usage
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def generate_data(seed):
@@ -117,6 +118,78 @@ def plot_histogram(sensor_a, sensor_b, ax):
     ax.grid(alpha=0.3)
 
 
+def plot_boxplot(sensor_a, sensor_b, ax):
+    """Create a side-by-side box plot comparison of sensor distributions.
+
+    Plots box plots for both sensors with custom styling and marks
+    the overall mean of both sensors combined.
+
+    Parameters
+    ----------
+    sensor_a : array_like
+        Temperature readings from Sensor A.
+    sensor_b : array_like
+        Temperature readings from Sensor B.
+    ax : matplotlib.axes.Axes
+        The Axes object on which to draw the box plot.
+
+    Returns
+    -------
+    None
+        Modifies the provided Axes object in place.
+    """
+    # Remove NaNs if present
+    sensor_a_clean = sensor_a[~np.isnan(sensor_a)]
+    sensor_b_clean = sensor_b[~np.isnan(sensor_b)]
+
+    overall_mean = np.mean(np.concatenate([sensor_a_clean, sensor_b_clean]))
+
+    ax.boxplot([sensor_a_clean, sensor_b_clean], labels=['Sensor A', 'Sensor B'], patch_artist=True,
+               boxprops=dict(facecolor='tab:blue', alpha=0.4), medianprops=dict(color='black'))
+    ax.axhline(overall_mean, color='red', linestyle='--', linewidth=1.5, label=f'Overall mean ({overall_mean:.2f} °C)')
+    ax.set_ylabel('Temperature (deg C)')
+    ax.set_title('Box plot comparison of Sensor A and Sensor B')
+    ax.legend()
+    ax.grid(alpha=0.3, axis='y', linestyle='--')
+
+
+def main():
+    """Generate sensor data and create publication-quality visualizations.
+
+    Creates synthetic temperature sensor data and produces three plots
+    (scatter, histogram, boxplot) in a single figure, then saves the
+    result as a high-resolution PNG file.
+
+    Returns
+    -------
+    None
+        Saves the plot figure to 'sensor_analysis.png'.
+    """
+    # Generate data with the same seed as in the notebook
+    sensor_a, sensor_b, timestamps = generate_data(9461)
+
+    # Create a 1x3 subplot figure
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+    # Create each plot
+    plot_scatter(sensor_a, sensor_b, timestamps, axes[0])
+    plot_histogram(sensor_a, sensor_b, axes[1])
+    plot_boxplot(sensor_a, sensor_b, axes[2])
+
+    # Adjust layout and save
+    plt.tight_layout()
+    plt.savefig('sensor_analysis.png', dpi=150, bbox_inches='tight')
+    plt.close()
+
+
+if __name__ == '__main__':
+    main()
+
+
 # Create plot_scatter(sensor_a, sensor_b, timestamps, ax) that draws
 # the scatter plot from the notebook onto the given Axes object.
 # NumPy-style docstring. Modifies ax in place, returns None.
+
+# Create main() that generates data, creates a 1x3 subplot figure,
+# calls each plot function, adjusts layout, and saves as sensor_analysis.png
+# at 150 DPI with tight bounding box.
